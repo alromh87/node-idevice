@@ -1,6 +1,6 @@
 "use strict";
 
-var exec = require('child_process').exec,
+var exec = require('child_process').execFile,
     path = require('path'),
     fs = require('fs');
 
@@ -52,24 +52,19 @@ IDevice.prototype._check_cmd = function () {
   return found;
 };
 
-IDevice.prototype._build_cmd = function (options) {
-    var cmd = '';
-
-    cmd += this.cmd;
-
+IDevice.prototype._build_args = function (options) {
+    var args = [];
     if (this.udid) {
-	cmd += " -u " + this.udid;
+        args.push("-u");
+        args.push(this.udid);
     }
 
-    if (typeof options == 'object' && options.indexOf) {
-	for (var i = 0; i < options.length; i++) {
-	    cmd += " " + options[i];
-	}
-    } else {
-	cmd += " " + options;
+    if (!(typeof options == 'object' && options.indexOf)) {
+        options = options.split(" ").filter(x => x);
     }
+    args = args.concat(options);
 
-    return cmd;
+    return args;
 };
 
 IDevice.prototype.list = function (option, cb) {
@@ -79,7 +74,7 @@ IDevice.prototype.list = function (option, cb) {
 	foption += option;
     }
 
-    exec(this._build_cmd(foption), function (err, stdout, stderr) {
+    exec(this.cmd, this._build_args(foption), function (err, stdout, stderr) {
 	if(err) {
 	    cb(err, stdout);
 	} else {
@@ -135,7 +130,7 @@ IDevice.prototype.listAll = function (cb) {
 };
 
 IDevice.prototype.remove = function (app, cb) {
-    exec(this._build_cmd(['-U', app]), function (err, stdout, stderr) {
+    exec(this.cmd, this._build_args(['-U', app]), function (err, stdout, stderr) {
 	if (err) {
 	    cb(err, stdout);
 	} else {
@@ -149,7 +144,7 @@ IDevice.prototype.remove = function (app, cb) {
 };
 
 IDevice.prototype.install = function (app, cb) {
-    exec(this._build_cmd(['-i', wrapForExec(app)]), function (err, stdout, stderr) {
+    exec(this.cmd, this._build_args(['-i', wrapForExec(app)]), function (err, stdout, stderr) {
 	if (err) {
 	    cb(err, stdout);
 	} else {
