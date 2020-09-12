@@ -1,6 +1,6 @@
 "use strict";
 
-var exec = require('child_process').execFile,
+const execFile = require('child_process').execFile,
     path = require('path'),
     fs = require('fs');
 
@@ -74,7 +74,7 @@ IDevice.prototype.list = function (option, cb) {
 	foption += option;
     }
 
-    exec(this.cmd, this._build_args(foption), function (err, stdout, stderr) {
+    execFile(this.cmd, this._build_args(foption), function (err, stdout, stderr) {
 	if(err) {
 	    cb(err, stdout);
 	} else {
@@ -130,7 +130,7 @@ IDevice.prototype.listAll = function (cb) {
 };
 
 IDevice.prototype.remove = function (app, cb) {
-    exec(this.cmd, this._build_args(['-U', app]), function (err, stdout, stderr) {
+    execFile(this.cmd, this._build_args(['-U', app]), function (err, stdout, stderr) {
 	if (err) {
 	    cb(err, stdout);
 	} else {
@@ -144,7 +144,7 @@ IDevice.prototype.remove = function (app, cb) {
 };
 
 IDevice.prototype.install = function (app, cb) {
-    exec(this.cmd, this._build_args(['-i', wrapForExec(app)]), function (err, stdout, stderr) {
+    execFile(this.cmd, this._build_args(['-i', app]), function (err, stdout, stderr) {
 	if (err) {
 	    cb(err, stdout);
 	} else {
